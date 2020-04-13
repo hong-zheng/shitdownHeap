@@ -1,0 +1,170 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+
+
+// 树
+// 每一颗子树都不相交
+// 树的边 等于 结点数-1
+// 满二叉树：除过最后一层其他层次的结点度都为2
+// 完全二叉树
+ // 第i层2^(i-1)个结点
+
+// 二叉树的结点总数：
+//	n0 + n1 + n2 = 二叉树的节点总数
+// 二叉树的边的总数 ：
+//		n1+2*n2 = 二叉树边的个数
+
+// 节点个数- 1 =边数
+// n0 = n2 + 1(度为0的节点为度为2的节点+1)
+// 
+
+// 满二叉树求高度:log(N+1) --> 2^h - 1 = N --> log(N+1)
+// 满二叉树节点个数是奇数个
+
+
+// 存放规则：顺序结构、链式结构
+// 顺序结构：存放完全二叉树，完全没有空间浪费
+
+//完全二叉树
+// 父节点的位置
+// parent
+// left_child = 2*child + 1
+// right_child = 2*child +1;
+// child : parent = (child -1)/2; // 其中child表示无论哪一个孩子
+
+// 一般树结构都是链式存储，链式结构
+// 存放不浪费空间（举例：全部只有左子树）
+// 顺序结构：存放完全二叉树
+
+// 链式结构：适合存放一般二叉树
+// 二叉链：数据，指向左右孩子的指针
+// 三叉链：数据，指向左右孩子的指针 + 指向父亲的指针
+
+// 完全二叉树：度为1的节点只有1个,n1=1
+// 度为1出现的位置：倒数第二层
+// 若全部节点数为偶数：则最后一层节点数为奇数个
+// 若总节点个数为奇数：则度为1的节点不存在,n1=0
+
+// 堆:是完全二叉树，因此无需用链表来存储，就用顺序表存储即可
+// 每个节点都是以根为最值的树，并且结构为完全二叉树
+// 建堆
+// 构建一个大根堆
+void swap(int tree[], int i, int j){
+	int tmp = tree[i];
+	tree[i] = tree[j];
+	tree[j] = tmp;
+}
+
+// 
+//void heapify(int tree[], int n, int i){
+//	//在一个数组中，如果下标值大于等于数组的长度就表示越界
+//	if (i >= n){
+//		return;
+//	}
+//	// 找到两个孩子节点
+//	int c1 = 2 * i + 1;
+//	int c2 = 2 * i + 2;
+//	int max = i;
+//	// 比较两个孩子节点与父节点大小 
+//	if ( c1 < n && tree[c1] > tree[max]){
+//		max = c1;
+//	}
+//	if (c2 < n && tree[c2] > tree[max]){
+//		max = c2;
+//	}
+//	// 判断是否改变
+//	if (i != max){
+//		// 改变之后就改变数据
+//		swap(tree, i, max);	
+//		// 递归
+//		heapify(tree, n, max);
+//	}
+//}
+//void buildHeap(int tree[] , int len){
+//	int last_node = len - 1;
+//	int parent = (last_node - 1) / 2;
+//	for (int i = parent; i >= 0; i--){
+//		heapify(tree,len,i);
+//	}
+//}
+void print(int arr[], int len){
+	for (int i = 0; i < len; i++){
+		printf("%d ",arr[i]);
+	}
+	printf("\n");
+}
+
+// 小堆
+typedef int HPDataType;
+// parent: 开始调整的位置
+
+void shiftDown(HPDataType* array, int size, int parent){
+	// 左孩子
+	int child = 2 * parent + 1;
+	while (child < size){
+		// 从左右孩子中选择最大的，有孩子存在的情况
+		if (child+1 < size && array[child + 1] < array[child]){
+			++child;
+		}
+		// 和父节点比较,
+		if (array[child] < array[parent]){
+			swap(array, parent, child);
+
+			// 更新
+			parent = child;
+			child = 2 * parent + 1;
+		}
+		else{
+			break;
+		}
+	}
+}
+typedef struct Heap{
+	HPDataType* _array;
+	int _size;
+	int _capacity;
+}Heap;
+// 数组建堆
+void heapCreat(Heap* hp,HPDataType* array, int size){
+	hp->_array = (HPDataType*)malloc(sizeof(HPDataType
+		)*size);
+	memcpy(hp->_array, array, sizeof(HPDataType)*size);
+	hp->_size = size;
+	hp->_capacity = size;
+
+	// 建堆，从最后一个非叶子节点开始建堆
+	for (int parent = (size - 2) / 2; parent >= 0; parent--){
+		shiftDown(hp->_array,size,parent);
+	}
+}
+
+// 小堆的向上调整
+void shiftUp(HPDataType* array , int child){
+	int parent = (child - 1) / 2;
+	while (child > 0){
+		if (array[child] < array[parent]){
+			swap(array, child, parent);
+			child = parent;
+			parent = (child - 1) / 2;
+		}
+		else
+		{
+			// 结束调整
+			break;
+		}
+	}
+	
+}
+int main(){
+	Heap hp;
+	int arr[] = {32,59,87 ,25,87,86,5,64,465};
+	int len = sizeof(arr) / sizeof(arr[0]);
+	print(arr, len);
+	heapCreat(&hp,arr, len);
+	print((&hp)->_array, len);
+	system("pause");
+	return 0;
+}
